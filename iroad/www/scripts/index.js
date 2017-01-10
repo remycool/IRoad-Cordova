@@ -1,79 +1,11 @@
-﻿//// Pour obtenir une présentation du modèle Vide, consultez la documentation suivante :
-//// http://go.microsoft.com/fwlink/?LinkID=397704
-//// Pour déboguer du code durant le chargement d'une page dans Ripple ou sur les appareils/émulateurs Android, lancez votre application, définissez des points d'arrêt, 
-//// puis exécutez "window.location.reload()" dans la console JavaScript.
-//(function () {
-//    "use strict";
-
-//    document.addEventListener( 'deviceready', onDeviceReady.bind( this ), false );
-
-//    function onDeviceReady() {
-
-//        if (navigator.connection.type == Connection.NONE) {
-//            //navigator.notification.alert('An internet connection is required to continue');
-//            div_network.popup("open");
-//        } else {
-//            initialiser();
-//        }
-
-//        // Gérer les événements de suspension et de reprise Cordova
-//        document.addEventListener( 'pause', onPause.bind( this ), false );
-//        document.addEventListener( 'resume', onResume.bind( this ), false );
-        
-//        // TODO: Cordova a été chargé. Effectuez l'initialisation qui nécessite Cordova ici.
-//        var parentElement = document.getElementById('deviceready');
-//        var listeningElement = parentElement.querySelector('.listening');
-//        var receivedElement = parentElement.querySelector('.received');
-//        listeningElement.setAttribute('style', 'display:none;');
-//        receivedElement.setAttribute('style', 'display:block;');
-
-//        function geo_ok(position) {
-//            //sauvegarde de la position courante 
-//            lat_current_position = position.coords.latitude;
-//            lng_current_position = position.coords.longitude;
-//            //console.log(lat_current_position , lng_current_position );
-//            lat_offset_position = lat_current_position;
-//            lng_offset_position = lng_current_position;
-//            //creation de la carte
-//            createMap();
-//            //recupérer les signalements existants
-//            recupererSignalements(lat_current_position, lng_current_position);
-
-//        }
-
-//        function geo_error(error) {
-//            div_geo.popup("open");
-
-//        }
-
-//        function geo() {
-//            if (navigator.geolocation) {
-//                navigator.geolocation.getCurrentPosition(
-//                    geo_ok,
-//                    geo_error,
-//                    { enableHighAccuracy: true, maximumAge: 5000, timeout: 5000 }
-//                );
-//            }
-//        }
-
-//    };
-
-//    function onPause(e) {
-//        e.preventDefault();
-//        // TODO: cette application a été suspendue. Enregistrez l'état de l'application ici.
-//    };
-
-//    function onResume() {
-//        // TODO: cette application a été réactivée. Restaurez l'état de l'application ici.
-//    };
-//} )();
+﻿
 
 $(document).ready(function () {
     document.addEventListener("deviceready", initialiser, false);
 });
 
 
-var isOnline = navigator.onLine ? true : false;
+var isOnline; 
 var isRotationSelected = false;
 var isParcoursSelected = false;
 
@@ -95,7 +27,6 @@ var liste_signalement_marker_map = [];
 var timer;
 var nbSignalements = 0;
 var watchPosition;
-// div_desc_signalement.popup();
 
 
 
@@ -167,11 +98,10 @@ function createMap() {
     map.addListener('drag',
        function () {
 
-           //afficher le bouton derecentrage
+           //afficher le bouton de recentrage
            div_refocus.fadeIn(400, 'swing');
            isOffCenter = true;
-           //on dezoome la carte
-           map.setZoom(DEFAULT_ZOOM);
+          
            //on remet à zero le timeout au cas ou on fait des "drag" successifs
            if (timer) {
                clearTimeout(timer);
@@ -307,21 +237,21 @@ function stopAutoNavigation() {
 };
 
 function initialiser() {
-    ////Vérification de l'état online/offline
-    //showConnection(isOnline);
+   
     document.addEventListener("offline", afficherSectionOffline, false);
     document.addEventListener("online", afficherSectionCarte, false);
+    //Evite la mise en veille de l'appareil
     window.powerManagement.acquire(function () {
         console.log('Wakelock acquired');
     }, function () {
         console.log('Failed to acquire wakelock');
     });
+    isOnline = navigator.onLine ? true : false;
     if (isOnline) {
         //placement du bouton de recentrage
         div_refocus.css({ "bottom": setHeightBottomControl() + "px" });
         div_signalement.css({ "bottom": setHeightBottomControl() + "px", "right": div_refocus.position().left + "px" });
         //initialiser la hauteur du div map 
-        //div_carte.css(({"width": "100%", "height": setHeightDivMap()+"px"}));
         div_carte.css(({ "width": "2000px", "height": "2000px", "left": "-" + translationWidth + "px", "top": "-" + translationHeight + "px" }));
         $('body').css('overflow', 'hidden')
         //cacher le bouton de recentrage
@@ -456,18 +386,9 @@ function eraseAllMarkersOnMap() {
 
 
 
-//Gestion du offline
-//window.addEventListener('online', showConnection('ONLINE'));
-//window.addEventListener('offline', function () {
-
-//    div_network.popup("open");
-
-//});
-
-//Gestion du tap sur les elements avec la classe 
 $(".img-btn").on("tap", function () {
     //Réduire la taille du bouton puis retrouve sa taille normale
-    $(this).animate({ 'width': '95%', 'height': 'auto' }, 100, function () { $(this).animate({ 'width': '100%', 'height': 'auto' }), 200 });
+    $(this).animate({ 'width': '65%', 'height': 'auto' }, 100, function () { $(this).animate({ 'width': '75%', 'height': 'auto' }), 200 });
     setTimeout(function () { window.location.href = "#carte"; }, 200);
 })
 
@@ -705,7 +626,7 @@ function annulerAfficherParcours() {
 function afficherSectionOffline() {
     isOnline = false;
     console.log("Hors - Ligne");
-    $.mobile.changePage( "./index.html#offline", { transition: "slideup", changeHash: false });
+    $.mobile.changePage( "./index.html#offline", { transition: "fade", changeHash: false });
 };
 
 function afficherSectionCarte() {
@@ -720,7 +641,7 @@ function afficherSectionCarte() {
 
 function retour() {
     if (isOnline) {
-        $.mobile.changePage("index.html#carte", { transition: "slideup", changeHash: false });
+        $.mobile.changePage("index.html#carte", { transition: "fade", changeHash: false });
     } else {
         $.mobile.changePage("index.html#offline", { transition: "slideup", changeHash: false });
     }

@@ -1,4 +1,8 @@
-﻿
+﻿html{
+    overflow-y:hidden;
+}
+
+
 .hd-statut{
 	display:inline-block;
 	width:48%;
@@ -66,7 +70,7 @@ z-index:1000;
 
 .img-btn{
 		cursor:pointer;
-        width: 100%;
+        width: 75%;
         height: auto;
 }
 
