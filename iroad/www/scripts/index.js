@@ -130,10 +130,6 @@ function createMap() {
 
 };
 
-function saveConfiguration() {
-    alert("test");
-
-};
 
 function addLatLng() {
     //ajoute au chemin parcouru la nouvelle position
@@ -589,7 +585,7 @@ function signalementsToLocal(remote_signalements) {
 			null,
 			remote_signalements[i].Id_Evenement,
 			remote_signalements[i].DateSignalement,
-			remote_signalements[i].Id_Utilisateur,
+			remote_signalements[i].Login,
 			remote_signalements[i].Note);
         var icon = getEvenement(parseInt(sign.evenement));
         //sign.marqueur = createMarker(icon.icon,sign.latitude,sign.longitude,sign.id);
@@ -634,10 +630,17 @@ function afficherSectionCarte() {
     var etat = navigator.connection.type;
     console.log(etat);
     //Dans le cas ou le chargement initial n'a pas eu lieu
-   
     window.location.reload(true);
     //$.mobile.changePage("./index.html#carte", { transition: "slideup", changeHash: false });
+    uploadSignalementToServer();
 };
+
+function uploadSignalementToServer() {
+    for (var i = 0; i < signalements_offline.length; i++) {
+        var s = signalements_offline[i];
+        signalerEvenement(s.id, s.icon, s.latSignalement, s.lngSignalement);
+    }
+}
 
 function retour() {
     if (isOnline) {
