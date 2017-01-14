@@ -42,13 +42,13 @@ var div_compass = $("#compass");
 isRotationSelected ? div_compass.show() : div_compass.hide();
 var div_statut = $("#header-statut");
 var div_refocus = $("#button-refocus");
-var div_signalement = $("#button-signalement");
+var div_controles = $("#controles");
 var div_desc_signalement = $("#desc_signalement");
 var div_network = $("#network_alert");
 var div_geo = $("#geo_alert");
 var div_offline = $("offline");
-var SIGNALER = "http://88.120.206.6:9210/iroad/php/signalerEvenement.php";
-var RECUPERER = "http://88.120.206.6:9210/iroad/php/recupererSignalements.php";
+var SIGNALER = "https://www.fuzzdev.fr/iroad/php/signalerEvenement.php";
+var RECUPERER = "https://www.fuzzdev.fr/iroad/php/recupererSignalements.php";
 
 
 var isOffCenter = false;
@@ -159,7 +159,7 @@ function geo_ok(position) {
 	//sauvegarde de la position courante 
 	lat_current_position = position.coords.latitude;
 	lng_current_position = position.coords.longitude;
-	//console.log(lat_current_position , lng_current_position );
+	console.log(lat_current_position , lng_current_position );
 	lat_offset_position = lat_current_position;
 	lng_offset_position = lng_current_position;
 	//creation de la carte
@@ -210,7 +210,7 @@ function updateMarkerMap(position) {
     var distParcourue = calculerDistanceParcourue();
     // >1km
     if (distParcourue > 1) {
-        recupererSignalements();
+        recupererSignalements(lat_current_position,lng_current_position);
         lat_offset_position = lat_current_position;
         lng_offset_position = lng_current_position;
     }
@@ -246,7 +246,7 @@ function initialiser() {
     if (isOnline) {
         //placement du bouton de recentrage
         div_refocus.css({ "bottom": setHeightBottomControl() + "px" });
-        div_signalement.css({ "bottom": setHeightBottomControl() + "px", "right": div_refocus.position().left + "px" });
+        div_controles.css({ "bottom": setHeightBottomControl() + "px", "right": div_refocus.position().left + "px" });
         //initialiser la hauteur du div map 
         div_carte.css(({ "width": "2000px", "height": "2000px", "left": "-" + translationWidth + "px", "top": "-" + translationHeight + "px" }));
         $('body').css('overflow', 'hidden')
@@ -285,7 +285,7 @@ function recentrer() {
     map.panTo(user_marker_map.getPosition());
     div_refocus.fadeOut(400, 'swing');
     //on zoome la carte à la valeur enregistrée
-    map.setZoom(currentZoom);
+    //map.setZoom(currentZoom);
     isOffCenter = false;
 };
 
@@ -296,10 +296,10 @@ function recentrageAuto() {
 		    var userPosition = user_marker_map.getPosition();
 		    map.panTo(userPosition);
 		    //on zoome la carte à la valeur enregistrée
-		    map.setZoom(currentZoom);
+		    //map.setZoom(currentZoom);
 		    lat_current_position = userPosition.lat();
 		    lng_current_position = userPosition.lng();
-		    recupererSignalements();
+		    recupererSignalements(lat_current_position,lng_current_position);
 		    div_refocus.fadeOut(400, 'swing');
 		    isOffCenter = false;
 		}, 5000);
@@ -461,17 +461,17 @@ function getEvenement(value) {
 };
 
 
-function signalerEvenement(id, icon) {
+function signalerEvenement(id, icon,latitude,longitude) {
     var params = {
-        latitude: lat_current_signalement,
-        longitude: lng_current_signalement,
+        latitude: latitude,
+        longitude: longitude,
         evenement: id
     };
     //TODO test Online
     $.post(SIGNALER, params, function (result) {
         $message = result.message;
         if (result.success) {
-            recupererSignalements(lat_current_signalement, lng_current_signalement);
+            recupererSignalements(latitude, longitude);
         }
     }, "json");
 };
@@ -482,15 +482,15 @@ function recupererSignalements(latitude, longitude) {
         latitude: latitude,
         longitude: longitude
     };
-    var nbSignalementsAvant = signalements.length;
+   // var nbSignalementsAvant = signalements.length;
     $.post(RECUPERER, params, function (result) {
         $message = result.message;
         if (result.success == true) {
 
             checkSignalements(result.signalements);
             //Règle de zoom de la map
-            if (signalements.length > nbSignalementsAvant)
-                autoZoom();
+            //if (signalements.length > nbSignalementsAvant)
+                //autoZoom();
         }
         console.log(nbSignalements);
 
@@ -645,9 +645,7 @@ function uploadSignalementToServer() {
 function retour() {
     if (isOnline) {
         $.mobile.changePage("index.html#carte", { transition: "fade", changeHash: false });
-    } else {
-        $.mobile.changePage("index.html#offline", { transition: "slideup", changeHash: false });
-    }
+    } 
 }
 //******************************* EVENEMENTS ***************************
 //
@@ -676,3 +674,13 @@ $("#flip-parcours").bind("change", function (event, ui) {
 });
 
 
+
+$("#a-zoomin").on('click', function () {
+    currentZoom++;
+    map.setZoom(currentZoom);
+});
+
+$("#a-zoomout").on('click', function () {
+    currentZoom--;
+    map.setZoom(currentZoom);
+});

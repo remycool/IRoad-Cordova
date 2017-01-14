@@ -77,13 +77,29 @@
                 <p>Veuillez activer la position sur le navigateur ou l'appareil</p>
             </div>
             <div id="compass"><img src="images/compass.png" /></div>
-
-            <div id="button-refocus" class="round-button"><div class="round-button-circle round-button-circle-refocus"><a id="a-refocus" href="" class="round-button"><span class="fa fa-bullseye "></span></a></div></div>
-            <!-- <div id="button-signalement" class="round-button"><div class="round-button-circle round-button-circle-signalement right"><a id="a-signalement" href="#signalement" class="round-button" data-transition="pop"><span class="fa fa-exclamation "></span></a></div></div>-->
-            <div id="button-signalement">
-                <a id="a-signalement" href="#signalement">
-                    <img src="images/signalement-btn.png">
+            <div id="button-refocus">
+                <a id="a-refocus" href="">
+                    <img src="images/focus.png">
                 </a>
+            </div>	
+           <!-- <div id="button-refocus" class="round-button"><div class="round-button-circle round-button-circle-refocus"><a id="a-refocus" href="" class="round-button"><span class="fa fa-bullseye "></span></a></div></div>-->
+            <!-- <div id="button-signalement" class="round-button"><div class="round-button-circle round-button-circle-signalement right"><a id="a-signalement" href="#signalement" class="round-button" data-transition="pop"><span class="fa fa-exclamation "></span></a></div></div>-->
+            <div id="controles" class="controles">
+                <div id="button-zoomin">
+                    <a id="a-zoomin" href="#">
+                        <img src="images/zoom-in.png">
+                    </a>
+                </div>
+                <div id="button-zoomout">
+                    <a id="a-zoomout" href="#">
+                        <img src="images/zoom-out.png">
+                    </a>
+                </div>
+                <div id="button-signalement">
+                    <a id="a-signalement" href="#signalement">
+                        <img src="images/signalement-btn.png">
+                    </a>
+                </div>
             </div>
         </div>
         <footer id="carte-footer" data-role="footer" data-position="fixed" data-theme="b">
@@ -109,10 +125,7 @@
 
     <!--page servant afficher les controles des différent signalements-->
     <section id="signalement" data-role="page" data-theme="b">
-        <header data-role="header" data-theme="b" data-position="fixed">
-            <a href="#" data-theme="d" data-icon="arrow-l" data-iconpos="notext" data-shadow="false" data-iconshadow="false" class="ui-icon-nodisc" onclick="retour()"></a>
-            <h1></h1>
-        </header>
+        <header data-role="header" data-theme="b" data-position="fixed"></header>
         <div class="content" data-role="content">
             <div id="signalement-content">
                 <div class="ui-grid-a">
@@ -121,9 +134,13 @@
                     <div class="ui-block-a"><center><img class="img-btn" src="images/travaux-btn.png" alt="Travaux" onclick="signaler('travaux')"></center></div>
                     <div class="ui-block-b"><center><img class="img-btn" src="images/bouchon-btn.png" alt="Bouchon" onclick="signaler('bouchon')"></center></div>
                 </div>
+                <div class="ui-grid-solo">
+                    <div class="ui-block-a">
+                        <a href="#" data-theme="d" data-icon="arrow-l" data-iconpos="notext" data-shadow="false" data-iconshadow="false" class="ui-icon-nodisc" onclick="retour()"></a>                    </div>
+                </div>
             </div>
         </div>
-        <footer data-role="footer" data-position="fixed" data-theme="b"><h1></h1></footer>
+        <footer data-role="footer" data-position="fixed" data-theme="b"></footer>
     </section>
 
     <!--page annexe-->
@@ -145,7 +162,7 @@
     
     <script type="text/javascript" src="cordova.js"></script>
     <script type="text/javascript" src="scripts/platformOverrides.js"></script>
-    <script src="http://maps.google.com/maps/api/js?key=AIzaSyBq_t5qPHzeth6FRotgPoStA3uJP-ZTrxY"></script>
+    <script src="https://maps.google.com/maps/api/js?key=AIzaSyBq_t5qPHzeth6FRotgPoStA3uJP-ZTrxY"></script>
     <script src="scripts/signalement.js"></script>
     <script src="scripts/trigonometrie.js"></script>
     <script type="text/javascript" src="scripts/index.js"></script>
