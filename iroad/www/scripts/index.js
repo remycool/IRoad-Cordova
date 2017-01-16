@@ -118,7 +118,7 @@ function createMap() {
         longitude = newCenter.lng();
         //Dévoiler les signalements
         console.log(" nouveau centre : " + latitude + " " + longitude);
-        recupererSignalements(latitude, longitude);
+        recupererSignalements(latitude, longitude,currentZoom);
     });
 
    
@@ -165,7 +165,7 @@ function geo_ok(position) {
 	//creation de la carte
 	createMap();
 	//recupérer les signalements existants
-	recupererSignalements(lat_current_position,lng_current_position);
+	recupererSignalements(lat_current_position,lng_current_position,currentZoom);
 
 }
 
@@ -210,7 +210,7 @@ function updateMarkerMap(position) {
     var distParcourue = calculerDistanceParcourue();
     // >1km
     if (distParcourue > 1) {
-        recupererSignalements(lat_current_position,lng_current_position);
+        recupererSignalements(lat_current_position,lng_current_position,currentZoom);
         lat_offset_position = lat_current_position;
         lng_offset_position = lng_current_position;
     }
@@ -299,7 +299,7 @@ function recentrageAuto() {
 		    //map.setZoom(currentZoom);
 		    lat_current_position = userPosition.lat();
 		    lng_current_position = userPosition.lng();
-		    recupererSignalements(lat_current_position,lng_current_position);
+		    recupererSignalements(lat_current_position,lng_current_position,currentZoom);
 		    div_refocus.fadeOut(400, 'swing');
 		    isOffCenter = false;
 		}, 5000);
@@ -385,7 +385,10 @@ function eraseAllMarkersOnMap() {
 $(".img-btn").on("tap", function () {
     //Réduire la taille du bouton puis retrouve sa taille normale
     $(this).animate({ 'width': '65%', 'height': 'auto' }, 100, function () { $(this).animate({ 'width': '75%', 'height': 'auto' }), 200 });
-    setTimeout(function () { window.location.href = "#carte"; }, 200);
+    setTimeout(function () {
+        if (isOnline)
+            window.location.href = "#carte"; 
+    }, 200);
 })
 
 function signaler(value) {
@@ -477,10 +480,11 @@ function signalerEvenement(id, icon,latitude,longitude) {
 };
 
 
-function recupererSignalements(latitude, longitude) {
+function recupererSignalements(latitude, longitude,zoom) {
     var params = {
         latitude: latitude,
-        longitude: longitude
+        longitude: longitude,
+        zoom:zoom
     };
    // var nbSignalementsAvant = signalements.length;
     $.post(RECUPERER, params, function (result) {
@@ -638,6 +642,9 @@ function afficherSectionCarte() {
 function uploadSignalementToServer() {
     for (var i = 0; i < signalements_offline.length; i++) {
         var s = signalements_offline[i];
+        if (!s.latSignalement && !s.lngSignalement) {
+            return false;
+        }
         signalerEvenement(s.id, s.icon, s.latSignalement, s.lngSignalement);
     }
 }
@@ -683,4 +690,13 @@ $("#a-zoomin").on('click', function () {
 $("#a-zoomout").on('click', function () {
     currentZoom--;
     map.setZoom(currentZoom);
+});
+
+$("#retour").on('click', function () {
+    var page = '';
+    if (isOnline)
+        page = "#carte";
+    else
+        page = "#offline";
+    window.location.href = page;
 });

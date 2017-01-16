@@ -17,7 +17,9 @@
     padding-left: 1%;
 }
 
-
+.ui-grid-solo > .ui-block-a{
+	text-align:right;
+}
 
 .right {
     float: right;
