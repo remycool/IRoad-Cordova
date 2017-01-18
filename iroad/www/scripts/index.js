@@ -8,7 +8,6 @@ $(document).ready(function () {
 var isOnline; 
 var isRotationSelected = false;
 var isParcoursSelected = false;
-
 var lat_offset_position;
 var lng_offset_position;
 var lat_current_position;
@@ -27,30 +26,7 @@ var liste_signalement_marker_map = [];
 var timer;
 var nbSignalements = 0;
 var watchPosition;
-
-
-
-//Icone
-var marker_img_icon = 'images/map-marker.png';
-var marker_sign_police = 'images/police-marqueur.png';
-var marker_sign_travaux = 'images/travaux-marqueur.png';
-var marker_sign_bouchon = 'images/bouchon-marqueur.png';
-var marker_sign_accident = 'images/accident-marqueur.png';
-
-var div_carte = $("#carte-content");
-var div_compass = $("#compass");
 isRotationSelected ? div_compass.show() : div_compass.hide();
-var div_statut = $("#header-statut");
-var div_refocus = $("#button-refocus");
-var div_controles = $("#controles");
-var div_desc_signalement = $("#desc_signalement");
-var div_network = $("#network_alert");
-var div_geo = $("#geo_alert");
-var div_offline = $("offline");
-var SIGNALER = "https://www.fuzzdev.fr/iroad/php/signalerEvenement.php";
-var RECUPERER = "https://www.fuzzdev.fr/iroad/php/recupererSignalements.php";
-
-
 var isOffCenter = false;
 var signalements = [];
 var signalements_offline = [];
@@ -75,7 +51,6 @@ calculerTranslationMap();
 //Créer une map
 function createMap() {
 
-    //TODO virer les controlles de la carte
     position_map = new google.maps.LatLng(lat_current_position, lng_current_position);
     options_map = {
         zoom: DEFAULT_ZOOM,
@@ -90,7 +65,7 @@ function createMap() {
     currentZoom = DEFAULT_ZOOM;
     user_marker_map = new google.maps.Marker({
         position: position_map,
-        icon: marker_img_icon
+        icon: MARKER_POSITION
     });
 
     //positionner le marqueur sur la carte
@@ -171,7 +146,6 @@ function geo_ok(position) {
 
 function geo_error(error) {
 	div_geo.popup("open");
-
 }
 
 function geo() {
@@ -184,6 +158,8 @@ function geo() {
 	}
 }
 
+
+// Fonctions de positionnement des DIV-------------------- 
 function setHeightDivMap() {
     var viewport_height = $(window).height();
     var header_height = $("#carte-header").outerHeight();
@@ -197,6 +173,8 @@ function setHeightBottomControl() {
 }
 
 //var i = 0; //itérateur de test
+
+
 
 //Mets à jour la carte en positionnant le marqueur à la position actuelle
 function updateMarkerMap(position) {
@@ -242,8 +220,8 @@ function initialiser() {
     }, function () {
         console.log('Failed to acquire wakelock');
     });
-    isOnline = navigator.onLine ? true : false;
-    if (isOnline) {
+    //isOnline = navigator.onLine ? true : false;
+    //if (isOnline) {
         //placement du bouton de recentrage
         div_refocus.css({ "bottom": setHeightBottomControl() + "px" });
         div_controles.css({ "bottom": setHeightBottomControl() + "px", "right": div_refocus.position().left + "px" });
@@ -256,7 +234,7 @@ function initialiser() {
         geo();
         //surveiller la position toute les 3 secondes
         watchPosition = navigator.geolocation.watchPosition(onWatchSuccess, onWatchError, { timeout: 3000 });
-    }
+    //}
 };
 
 function onWatchSuccess(position) {
@@ -269,14 +247,7 @@ function onWatchError(error) {
 };
 
 
-$(document).on("pageshow", function (event, data) {
-    if (map) {
-        google.maps.event.trigger(map, "resize"); //permet d'éviter d'afficher une carte grisée
-        if (user_marker_map) {
-            map.setCenter(user_marker_map.getPosition());
-        }
-    }
-});
+
 
 //Test
 //var positionnement = setInterval(updateMarkerMap, 500);
@@ -314,17 +285,7 @@ function autoZoom() {
 };
 
 
-$("#a-refocus").on('click', function () {
-    recentrer();
-});
 
-$("#a-signalement").on('click', function () {
-    //enregistre la position de l'évènement
-    lat_current_signalement = lat_current_position;
-    lng_current_signalement = lng_current_position;
-    console.log("Signalement en lat :" + lat_current_signalement + ", lng : " + lng_current_signalement);
-
-});
 
 function createMarker(icon, signalement) {
 
@@ -346,20 +307,18 @@ function addInfoWindow(marker, signalement) {
     var iconInfo;
     switch (signalement.evenement) {
         case '1':
-            iconInfo = 'images/bouchon-btn.png';
+            iconInfo = ICON_BOUCHON;
             break;
         case '2':
-            iconInfo = 'images/police-btn.png';
+            iconInfo = ICON_POLICE;
             break;
         case '3':
-            iconInfo = 'images/accident-btn.png';
+            iconInfo = ICON_ACCIDENT;
             break;
         case '4':
-            iconInfo = 'images/travaux-btn.png';
+            iconInfo = ICON_TRAVAUX;
             break;
     };
-
-
 
     google.maps.event.addListener(marker, 'click', function (event) {
 
@@ -370,7 +329,11 @@ function addInfoWindow(marker, signalement) {
     });
 };
 
+//******************************************
+//
 //Efface tous les marqueurs de la carte
+//
+//******************************************
 function eraseAllMarkersOnMap() {
     if (signalements.length > 0) {
         for (var i = 0; i < signalements.length; i++) {
@@ -382,14 +345,7 @@ function eraseAllMarkersOnMap() {
 
 
 
-$(".img-btn").on("tap", function () {
-    //Réduire la taille du bouton puis retrouve sa taille normale
-    $(this).animate({ 'width': '65%', 'height': 'auto' }, 100, function () { $(this).animate({ 'width': '75%', 'height': 'auto' }), 200 });
-    setTimeout(function () {
-        if (isOnline)
-            window.location.href = "#carte"; 
-    }, 200);
-})
+
 
 function signaler(value) {
 
@@ -407,8 +363,17 @@ function signaler(value) {
 
 };
 
+//********************************************************************
+//
+// Enregistre dans un tableau et également dans le storage le signalement
+//
+//*********************************************************************
 
 function  signalerEvenementOffline(id, icon, latSignalement, lngSignalement){
+
+    if (!latSignalement && !lngSignalement)
+        return false;
+
     var signalement = {
         id:id,
         icon:icon,
@@ -417,7 +382,7 @@ function  signalerEvenementOffline(id, icon, latSignalement, lngSignalement){
     };
     signalements_offline.push(signalement);
     window.sessionStorage.signalement_Offline = signalements_offline;
-    alert("Votre signalement en "+latSignalement+ " - "+lngSignalement+" a été pris en compte");
+    alert("Votre signalement a été pris en compte");
 };
 
 function getEvenement(value) {
@@ -427,33 +392,33 @@ function getEvenement(value) {
     var id;
     switch (value) {
         case 'controle':
-            icon = marker_sign_police;
+            icon = MARKER_POLICE;
             id = 2;
             break;
         case 'accident':
             id = 3;
-            icon = marker_sign_accident;
+            icon = MARKER_ACCIDENT;
             break;
         case 'bouchon':
             id = 1;
-            icon = marker_sign_bouchon;
+            icon = MARKER_BOUCHON;
             break;
         case 'travaux':
             id = 4;
-            icon = marker_sign_travaux;
+            icon = MARKER_TRAVAUX;
             break;
         case 2:
-            icon = marker_sign_police;
+            icon = MARKER_POLICE;
             break;
         case 3:
-            icon = marker_sign_accident;
+            icon = MARKER_ACCIDENT;
             break;
         case 1:
-            icon = marker_sign_bouchon;
+            icon = MARKER_BOUCHON;
             break;
         case 4:
 
-            icon = marker_sign_travaux;
+            icon = MARKER_TRAVAUX;
             break;
 
 
@@ -463,14 +428,19 @@ function getEvenement(value) {
     return { icon: icon, id: id };
 };
 
-
+//**********************************************************
+//
+// Envoie au serveur le nouveau signalement et récupère les
+// signalements. 
+//
+//**********************************************************
 function signalerEvenement(id, icon,latitude,longitude) {
     var params = {
         latitude: latitude,
         longitude: longitude,
         evenement: id
     };
-    //TODO test Online
+    //TODO Faire un seul appel ajax pour à la fois signaler et récupérer les alertes
     $.post(SIGNALER, params, function (result) {
         $message = result.message;
         if (result.success) {
@@ -479,6 +449,13 @@ function signalerEvenement(id, icon,latitude,longitude) {
     }, "json");
 };
 
+
+//**********************************************************
+//
+// Récupère les signalements depuis la BDD
+// en fonction de la position et du zoom actuel de la carte
+//
+//**********************************************************
 
 function recupererSignalements(latitude, longitude,zoom) {
     var params = {
@@ -534,6 +511,8 @@ function checkSignalements(remote_signalements) {
         for (var j = 0; j < remote_signalements.length; j++) {
             if (signalements[i].id == remote_signalements[j].Id) {
                 isInRemote = true;
+                //récupérer la note si elle a évoluée entre-temps
+                signalements[i].note = remote_signalements[j].Note;
                 break;
             }
         }
@@ -580,6 +559,12 @@ function checkSignalements(remote_signalements) {
     console.log("Nb Signalements : " + signalements.length);
 };
 
+//*************************************************
+//
+// Enregistre en local les nouveaux signalements reçus
+// et les place sur la carte 
+//
+//*************************************************
 function signalementsToLocal(remote_signalements) {
     for (var i = 0; i < remote_signalements.length; i++) {
         var sign = new signalement(
@@ -617,6 +602,12 @@ function afficherParcours() {
 
 };
 
+
+//*************************************************
+//
+// Supprime le tracé du parcours sur la carte
+//
+//*************************************************
 function annulerAfficherParcours() {
     if (poly) {
         poly.setMap(null);
@@ -633,10 +624,9 @@ function afficherSectionCarte() {
     isOnline = true;
     var etat = navigator.connection.type;
     console.log(etat);
-    //Dans le cas ou le chargement initial n'a pas eu lieu
-    window.location.reload(true);
-    //$.mobile.changePage("./index.html#carte", { transition: "slideup", changeHash: false });
     uploadSignalementToServer();
+    $.mobile.changePage("./index.html#carte", { transition: "slideup", changeHash: false });
+  
 };
 
 function uploadSignalementToServer() {
@@ -654,8 +644,31 @@ function retour() {
         $.mobile.changePage("index.html#carte", { transition: "fade", changeHash: false });
     } 
 }
-//******************************* EVENEMENTS ***************************
-//
+
+
+//EVENEMENTS *********************************************************
+
+$(document).on("pageshow", function (event, data) {
+    if (map) {
+        google.maps.event.trigger(map, "resize"); //permet d'éviter d'afficher une carte grisée
+        if (user_marker_map) {
+            map.setCenter(user_marker_map.getPosition());
+        }
+    }
+});
+
+$("#a-refocus").on('click', function () {
+    recentrer();
+});
+
+$("#a-signalement , #a-signalement-offline").on('click', function () {
+    //enregistre la position de l'évènement
+    lat_current_signalement = lat_current_position;
+    lng_current_signalement = lng_current_position;
+    console.log("Signalement en lat :" + lat_current_signalement + ", lng : " + lng_current_signalement);
+
+});
+
 
 $("#flip-rotation").bind("change", function (event, ui) {
     isRotationSelected = $(this).val() == 'on' ? true : false;
@@ -680,7 +693,16 @@ $("#flip-parcours").bind("change", function (event, ui) {
     }
 });
 
-
+$(".img-btn").on("tap", function () {
+    //Réduire la taille du bouton puis retrouve sa taille normale
+    $(this).animate({ 'width': '65%', 'height': 'auto' }, 100, function () { $(this).animate({ 'width': '75%', 'height': 'auto' }), 200 });
+    setTimeout(function () {
+        if (isOnline)
+            window.location.href = "#carte";
+        else
+            window.location.href = "#offline";
+    }, 200);
+})
 
 $("#a-zoomin").on('click', function () {
     currentZoom++;
