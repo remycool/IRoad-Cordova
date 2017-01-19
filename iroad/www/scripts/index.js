@@ -716,9 +716,8 @@ $("#a-zoomout").on('click', function () {
 
 $("#retour").on('click', function () {
     var page = '';
-    if (isOnline)
+   
         page = "#carte";
-    else
-        page = "#offline";
+
     window.location.href = page;
 });
